@@ -57,7 +57,7 @@ func (s *RoomSession) Disconnect(ID string) error {
 }
 
 func (s *RoomSession) Broadcast(senderID, msg string) error {
-	connections, err := s.repository.GetAll()
+	connections, err := s.Repository.GetAll()
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (s *RoomSession) Broadcast(senderID, msg string) error {
 				ConnectionID: senderID,
 			}
 
-			err := s.messenger.Send(message, con.ID)
+			err := s.Messenger.Send(message, con.ID)
 			if err != nil {
 				log.Printf("WARN: failed to deliver the message to %s", con.ID)
 			}
