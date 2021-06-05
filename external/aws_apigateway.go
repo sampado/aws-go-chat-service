@@ -1,9 +1,11 @@
 package external
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -17,6 +19,27 @@ const (
 	EnvAPIGatewayEndpoint = "API_GATEWAY_ENDPOINT"
 	EnvRegion             = "REGION"
 )
+
+func NewApiGatewayResponseOK(msg string) events.APIGatewayProxyResponse {
+	var buf bytes.Buffer
+	body, err := json.Marshal(map[string]interface{}{
+		"message": msg,
+	})
+	if err != nil {
+		return events.APIGatewayProxyResponse{StatusCode: 500}
+	}
+
+	json.HTMLEscape(&buf, body)
+	return events.APIGatewayProxyResponse{
+		StatusCode:      200,
+		IsBase64Encoded: false,
+		Body:            buf.String(),
+		Headers: map[string]string{
+			"Content-Type":           "application/json",
+			"X-MyCompany-Func-Reply": "connect-handler",
+		},
+	}
+}
 
 func newAPIGatewaySession() *apigatewaymanagementapi.ApiGatewayManagementApi {
 	sess, _ := session.NewSession(&aws.Config{
