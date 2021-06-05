@@ -4,23 +4,25 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
 type Response events.APIGatewayProxyResponse
+type Request events.APIGatewayWebsocketProxyRequest
 
-// Handler is our lambda handler invoked by the `lambda.Start` function call
-func Handler(ctx context.Context) (Response, error) {
+// Handler is our lambda handler. It subscribes an user to the pool of connected users.
+func Handler(ctx context.Context, request Request) (Response, error) {
+	// gets connection id
+	connectionId := request.RequestContext.ConnectionID
+	// saves connection id into a database
+
+	// return OK
 	var buf bytes.Buffer
-
 	body, err := json.Marshal(map[string]interface{}{
-		"message": "Connect function executed successfully!",
+		"message": fmt.Sprintf("User %s connected successfully!", connectionId),
 	})
 	if err != nil {
 		return Response{StatusCode: 404}, err
