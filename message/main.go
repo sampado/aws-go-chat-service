@@ -20,7 +20,7 @@ func Handler(ctx context.Context) (Response, error) {
 	var buf bytes.Buffer
 
 	body, err := json.Marshal(map[string]interface{}{
-		"message": "Connect function executed successfully!",
+		"message": "Message function executed successfully!",
 	})
 	if err != nil {
 		return Response{StatusCode: 404}, err
@@ -33,7 +33,7 @@ func Handler(ctx context.Context) (Response, error) {
 		Body:            buf.String(),
 		Headers: map[string]string{
 			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "connect-handler",
+			"X-MyCompany-Func-Reply": "message-handler",
 		},
 	}
 

@@ -12,6 +12,7 @@
 # Happy Coding!
 
 service: aws-go-chat-service
+configValidationMode: error
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -59,16 +60,15 @@ functions:
     handler: bin/connect
     events:
       - websocket: $connect
-#      - httpApi:
-#          path: /connect
-#          method: get
   disconnect:
     handler: bin/disconnect
     events:
       - websocket: $disconnect
-#      - httpApi:
-#          path: /disconnect
-#          method: get
+  message:
+    handler: bin/message
+    events:
+      - websocket:
+          route: onMessage # will trigger if $request.body.action === "onMessage"
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
