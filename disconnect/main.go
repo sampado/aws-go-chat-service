@@ -25,7 +25,6 @@ func DisconnectHandler(chat *chat.RoomSession) func(ctx context.Context, request
 		// return OK
 		return external.NewApiGatewayResponseOK("Disconnect function executed successfully!"), nil
 	}
-
 }
 
 func main() {

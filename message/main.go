@@ -1,45 +1,48 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/sampado/aws-go-chat-service/chat"
+	"github.com/sampado/aws-go-chat-service/external"
 )
 
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
-type Response events.APIGatewayProxyResponse
+type Request events.APIGatewayWebsocketProxyRequest
 
-// Handler is our lambda handler invoked by the `lambda.Start` function call
-func Handler(ctx context.Context) (Response, error) {
-	var buf bytes.Buffer
+// RequestPayload represents the request body sent by the Socket
+type RequestPayload struct {
+	Message string `json:"message"`
+}
 
-	body, err := json.Marshal(map[string]interface{}{
-		"message": "Message function executed successfully!",
-	})
-	if err != nil {
-		return Response{StatusCode: 404}, err
+func OnMessageHandler(chat *chat.RoomSession) func(ctx context.Context, request Request) (events.APIGatewayProxyResponse, error) {
+	return func(ctx context.Context, request Request) (events.APIGatewayProxyResponse, error) {
+		// gets connection id
+		connectionId := request.RequestContext.ConnectionID
+		// Parse the request
+		var requestPayload RequestPayload
+		if err := json.Unmarshal([]byte(request.Body), &requestPayload); err != nil {
+			return external.NewApiGatewayErrorResponse(400, "bad request"), err
+		}
+
+		// saves connection id into a database
+		err := chat.Broadcast(connectionId, requestPayload.Message)
+		if err != nil {
+			return events.APIGatewayProxyResponse{StatusCode: 500}, err
+		}
+
+		// return OK
+		return external.NewApiGatewayResponseOK("Message function executed successfully!"), nil
 	}
-	json.HTMLEscape(&buf, body)
-
-	resp := Response{
-		StatusCode:      200,
-		IsBase64Encoded: false,
-		Body:            buf.String(),
-		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "message-handler",
-		},
-	}
-
-	return resp, nil
 }
 
 func main() {
-	lambda.Start(Handler)
+	chat := &chat.RoomSession{
+		Repository: external.NewAWSDynamoDBRepository(),
+		Messenger:  external.NewAPIGatewayMessenger(),
+	}
+
+	lambda.Start(OnMessageHandler(chat))
 }

@@ -35,8 +35,27 @@ func NewApiGatewayResponseOK(msg string) events.APIGatewayProxyResponse {
 		IsBase64Encoded: false,
 		Body:            buf.String(),
 		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "connect-handler",
+			"Content-Type": "application/json",
+		},
+	}
+}
+
+func NewApiGatewayErrorResponse(code int, msg string) events.APIGatewayProxyResponse {
+	var buf bytes.Buffer
+	body, err := json.Marshal(map[string]interface{}{
+		"message": msg,
+	})
+	if err != nil {
+		return events.APIGatewayProxyResponse{StatusCode: 500}
+	}
+
+	json.HTMLEscape(&buf, body)
+	return events.APIGatewayProxyResponse{
+		StatusCode:      code,
+		IsBase64Encoded: false,
+		Body:            buf.String(),
+		Headers: map[string]string{
+			"Content-Type": "application/json",
 		},
 	}
 }
