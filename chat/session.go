@@ -63,16 +63,14 @@ func (s *RoomSession) Broadcast(senderID, msg string) error {
 	}
 
 	for _, con := range connections {
-		if con.ID == senderID {
-			message := MessageData{
-				Message:      msg,
-				ConnectionID: senderID,
-			}
+		message := MessageData{
+			Message:      msg,
+			ConnectionID: senderID,
+		}
 
-			err := s.Messenger.Send(message, con.ID)
-			if err != nil {
-				log.Printf("WARN: failed to deliver the message to %s", con.ID)
-			}
+		err := s.Messenger.Send(message, con.ID)
+		if err != nil {
+			log.Printf("WARN: failed to deliver the message to %s. %v", con.ID, err)
 		}
 	}
 

@@ -12,10 +12,7 @@ import (
 )
 
 const (
-	EnvAccessKeyID        = "ACCESS_KEY"
-	EnvSecretAccessKey    = "SECRET_KEY"
-	EnvAPIGatewayEndpoint = "API_GATEWAY_ENDPOINT"
-	EnvRegion             = "REGION"
+	APIGatewayEndpoint = "wss://7lucxu8nrd.execute-api.us-east-1.amazonaws.com/dev"
 )
 
 func NewApiGatewayResponseOK(msg string) events.APIGatewayProxyResponse {
@@ -59,13 +56,11 @@ func NewApiGatewayErrorResponse(code int, msg string) events.APIGatewayProxyResp
 }
 
 func newAPIGatewaySession() *apigatewaymanagementapi.ApiGatewayManagementApi {
-	//sess, _ := session.NewSession(&aws.Config{
-	//	Region:      aws.String(os.Getenv(EnvRegion)),
-	//	Credentials: credentials.NewStaticCredentials(os.Getenv(EnvAccessKeyID), os.Getenv(EnvSecretAccessKey), ""),
-	//	Endpoint:    aws.String(os.Getenv(EnvAPIGatewayEndpoint)),
-	//})
-	mySession := session.Must(session.NewSession())
-	return apigatewaymanagementapi.New(mySession)
+	sess, _ := session.NewSession(&aws.Config{
+		Endpoint: aws.String(APIGatewayEndpoint),
+	})
+	//mySession := session.Must(session.NewSession())
+	return apigatewaymanagementapi.New(sess)
 }
 
 type APIGatewayMessenger struct {
