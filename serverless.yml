@@ -94,7 +94,7 @@ resources:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        TableName: chat-connections
+        TableName: ${self:custom.chatConnectionsTableName}
         AttributeDefinitions:
           - AttributeName: connectionID
             AttributeType: S
