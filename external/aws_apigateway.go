@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	APIGatewayEndpoint = "wss://7lucxu8nrd.execute-api.us-east-1.amazonaws.com/dev"
+	APIGatewayEndpoint = "https://7lucxu8nrd.execute-api.us-east-1.amazonaws.com/dev"
 )
 
 func NewApiGatewayResponseOK(msg string) events.APIGatewayProxyResponse {
