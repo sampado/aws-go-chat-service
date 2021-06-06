@@ -3,6 +3,7 @@ package external
 import (
 	"errors"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -11,8 +12,8 @@ import (
 	"github.com/sampado/aws-go-chat-service/chat"
 )
 
-const (
-	ConnectionsTable = "chat-connections"
+var (
+	connectionsTable = os.Getenv("CHAT_CONNECTIONS_TABLE_NAME")
 )
 
 func NewDynamoDBSession() *dynamodb.DynamoDB {
@@ -44,7 +45,7 @@ func getPrimaryKey(ID string) map[string]*dynamodb.AttributeValue {
 func (r *AWSDynamoDBRepository) Get(ID string) (*chat.ConnectionItem, error) {
 	input := &dynamodb.GetItemInput{
 		Key:       getPrimaryKey(ID),
-		TableName: aws.String(ConnectionsTable),
+		TableName: aws.String(connectionsTable),
 	}
 	result, err := r.db.GetItem(input)
 	if err != nil {
@@ -58,7 +59,7 @@ func (r *AWSDynamoDBRepository) Get(ID string) (*chat.ConnectionItem, error) {
 
 func (r *AWSDynamoDBRepository) GetAll() ([]chat.ConnectionItem, error) {
 	input := &dynamodb.ScanInput{
-		TableName: aws.String(ConnectionsTable),
+		TableName: aws.String(connectionsTable),
 	}
 	result, err := r.db.Scan(input)
 	if err != nil {
@@ -90,7 +91,7 @@ func (r *AWSDynamoDBRepository) Save(connection *chat.ConnectionItem) error {
 
 	input := &dynamodb.PutItemInput{
 		Item:      item,
-		TableName: aws.String(ConnectionsTable),
+		TableName: aws.String(connectionsTable),
 	}
 
 	r.db.PutItem(input)
@@ -106,7 +107,7 @@ func (r *AWSDynamoDBRepository) Save(connection *chat.ConnectionItem) error {
 func (r *AWSDynamoDBRepository) Delete(ID string) error {
 	input := &dynamodb.DeleteItemInput{
 		Key:       getPrimaryKey(ID),
-		TableName: aws.String(ConnectionsTable),
+		TableName: aws.String(connectionsTable),
 	}
 
 	_, err := r.db.DeleteItem(input)

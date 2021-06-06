@@ -3,11 +3,9 @@ package external
 import (
 	"bytes"
 	"encoding/json"
-	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigatewaymanagementapi"
 	"github.com/sampado/aws-go-chat-service/chat"
@@ -61,12 +59,13 @@ func NewApiGatewayErrorResponse(code int, msg string) events.APIGatewayProxyResp
 }
 
 func newAPIGatewaySession() *apigatewaymanagementapi.ApiGatewayManagementApi {
-	sess, _ := session.NewSession(&aws.Config{
-		Region:      aws.String(os.Getenv(EnvRegion)),
-		Credentials: credentials.NewStaticCredentials(os.Getenv(EnvAccessKeyID), os.Getenv(EnvSecretAccessKey), ""),
-		Endpoint:    aws.String(os.Getenv(EnvAPIGatewayEndpoint)),
-	})
-	return apigatewaymanagementapi.New(sess)
+	//sess, _ := session.NewSession(&aws.Config{
+	//	Region:      aws.String(os.Getenv(EnvRegion)),
+	//	Credentials: credentials.NewStaticCredentials(os.Getenv(EnvAccessKeyID), os.Getenv(EnvSecretAccessKey), ""),
+	//	Endpoint:    aws.String(os.Getenv(EnvAPIGatewayEndpoint)),
+	//})
+	mySession := session.Must(session.NewSession())
+	return apigatewaymanagementapi.New(mySession)
 }
 
 type APIGatewayMessenger struct {
