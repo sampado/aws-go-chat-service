@@ -15,3 +15,4 @@ deploy: clean build
 gomodgen:
 	chmod u+x gomod.sh
 	./gomod.sh
+	go mod tidy

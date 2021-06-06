@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,9 +21,11 @@ func ConnectHandler(chat *chat.RoomSession) func(ctx context.Context, request Re
 		// gets connection id
 		connectionId := request.RequestContext.ConnectionID
 
+		log.Printf("connecting %s", connectionId)
 		// saves connection id into a database
 		err := chat.Connect(connectionId)
 		if err != nil {
+			log.Printf("failed trying to connect %s - error: %v", connectionId, err)
 			return events.APIGatewayProxyResponse{StatusCode: 500}, err
 		}
 
